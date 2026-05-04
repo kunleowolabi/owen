@@ -4,8 +4,9 @@ A cooperative financial management platform for organisations that run group sav
 
 Owen gives administrators a structured, auditable record of member contributions, active cycles, and compliance flags — the kind of paper trail that informal thrift groups typically lack.
 
-![Members](screenshots/members.png)
+![Members](screenshots/Members.png)
 ![Flags](screenshots/flags.png)
+![Overview](screenshots/Overview.png)
 
 ---
 
