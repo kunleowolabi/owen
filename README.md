@@ -64,3 +64,24 @@ npm install
 ```
 
 Create a `.env` file in the root:
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_KEY=your_supabase_anon_key
+
+
+Then:
+
+```bash
+npm run dev
+```
+
+The app connects to a live Supabase instance. To use your own, apply `schema.sql` to a new Supabase project via the SQL editor, then update your `.env`.
+
+---
+
+## Database
+
+The full schema — tables, enums, RLS policies, indexes, and the custom auth hook — is in `schema.sql` at the root of this repo.
+
+---
+
+*Owen is the first in a series of projects. The ones that follow will get closer to the engineering and energy domain — but they'll build on the same foundation of structured data and accountable systems.*
