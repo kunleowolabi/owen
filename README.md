@@ -6,7 +6,6 @@ Owen gives administrators a structured, auditable record of member contributions
 
 ![Members](screenshots/Members.png)
 ![Flags](screenshots/flags.png)
-![Overview](screenshots/Overview.png)
 
 ---
 
