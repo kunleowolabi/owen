@@ -178,7 +178,7 @@ function MemberForm() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full bg-[#5ac499] hover:bg-[#3da87d] text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors disabled:opacity-50"
+          className="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors disabled:opacity-50"
         >
           {loading ? 'Adding...' : 'Add Member'}
         </button>

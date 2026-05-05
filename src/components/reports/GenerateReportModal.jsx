@@ -73,7 +73,7 @@ function GenerateReportModal({ onClose, tenant }) {
             <button
               onClick={handleDownload}
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-[#5ac499] hover:bg-[#3da87d] text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
             >
               {loading ? 'Generating...' : 'Download PDF'}
             </button>
