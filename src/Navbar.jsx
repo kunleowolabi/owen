@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
-import logo from '../assets/logo.svg'
+
+// Remove the import logo line entirely
 
 function Navbar() {
   return (
@@ -10,7 +11,7 @@ function Navbar() {
         <div className="flex items-center py-3">
           <img src="/logo.svg" alt="Owen" className="h-9 w-auto min-w-[120px]" />
         </div>
-
+        
         {/* Centre — Nav links */}
         <div className="flex items-center gap-1">
           {[
