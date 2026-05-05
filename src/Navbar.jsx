@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import logo from '../assets/logo.svg'
 
 function Navbar() {
   return (
@@ -7,7 +8,7 @@ function Navbar() {
 
         {/* Left — Logo */}
         <div className="flex items-center py-3">
-          <img src="/src/assets/logo.svg" alt="Thriftly" className="h-9 w-auto min-w-[120px]" />
+          <img src="/logo.svg" alt="Owen" className="h-9 w-auto min-w-[120px]" />
         </div>
 
         {/* Centre — Nav links */}
