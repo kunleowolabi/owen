@@ -1,8 +1,11 @@
 import StatCard from '../ui/StatCard'
 import { useTotalCycleCount, useActiveCycleCount } from '../../hooks/useCycles'
 import { useTotalContributions } from '../../hooks/useOverviewStats'
+import { useTenant } from '../../context/TenantContext'
+import { formatMoney } from '../../utils/money'
 
 function CyclesStatsRow() {
+  const tenant = useTenant()
   const { data: totalCycles, isLoading: loadingTotal } = useTotalCycleCount()
   const { data: openCycles, isLoading: loadingOpen } = useActiveCycleCount()
   const { data: totalContributions, isLoading: loadingContributions } = useTotalContributions()
@@ -13,7 +16,7 @@ function CyclesStatsRow() {
       <StatCard title="Open Cycles" value={loadingOpen ? '...' : openCycles} />
       <StatCard
         title="Total Amount Collected"
-        value={loadingContributions ? '...' : `£${Number(totalContributions).toLocaleString()}`}
+        value={loadingContributions ? '...' : formatMoney(totalContributions, tenant?.currency)}
       />
     </div>
   )

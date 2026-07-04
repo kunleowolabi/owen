@@ -1,6 +1,6 @@
 import { supabase } from '../supabaseClient';
 
-export async function getMembers(thriftGroupId) {
+export async function getMembers(contributionGroupId) {
   const { data, error } = await supabase
     .from('memberships')
     .select(`
@@ -16,7 +16,7 @@ export async function getMembers(thriftGroupId) {
         kyc_status
       )
     `)
-    .eq('thrift_group_id', thriftGroupId)
+    .eq('contribution_group_id', contributionGroupId)
     .order('join_date', { ascending: false });
 
   if (error) throw error;
@@ -112,7 +112,6 @@ export async function getMissedContributionsCount() {
   return count;
 }
 
-// memberService.js — replace getKycBreakdown
 export async function getKycBreakdown() {
   const { data, error } = await supabase
     .from('memberships')
@@ -127,7 +126,6 @@ export async function getKycBreakdown() {
   }, {});
 }
 
-// memberService.js — replace getFlagSeverityBreakdown
 export async function getFlagSeverityBreakdown() {
   const { data, error } = await supabase
     .from('flags')
@@ -143,33 +141,31 @@ export async function getFlagSeverityBreakdown() {
   }, {});
 }
 
-export async function createMember({ fullName, email, phone, dateOfBirth, gender, thriftGroupId, role, joinDate, createdBy }) {
-  const TENANT_ID = 'fb03c7b6-6d60-47aa-abd9-0d23fc765142';
+export async function createMember({ fullName, email, phone, dateOfBirth, gender, contributionGroupId, role, joinDate, createdBy }) {
+  // tenant_id is assigned by the database (column default reads the JWT claim).
+  // NOTE: users has no created_by column — previously sent here, which broke this insert.
 
   // Step 1: Create the user record
   const { data: user, error: userError } = await supabase
     .from('users')
     .insert({
-      tenant_id: TENANT_ID,
       full_name: fullName,
       email,
       phone: phone || null,
       date_of_birth: dateOfBirth || null,
       gender: gender || null,
-      created_by: createdBy,
     })
     .select()
     .single();
 
   if (userError) throw userError;
 
-  // Step 2: Create the membership record linking user to thrift group
+  // Step 2: Create the membership record linking user to contribution group
   const { data: membership, error: membershipError } = await supabase
     .from('memberships')
     .insert({
-      tenant_id: TENANT_ID,
       user_id: user.id,
-      thrift_group_id: thriftGroupId,
+      contribution_group_id: contributionGroupId,
       role,
       join_date: joinDate,
       status: 'active',
@@ -214,6 +210,3 @@ export async function getTopContributors(limit = 5) {
 
   return aggregated;
 }
-
-
-

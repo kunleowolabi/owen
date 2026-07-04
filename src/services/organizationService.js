@@ -1,7 +1,5 @@
 import { supabase } from '../supabaseClient';
 
-const TENANT_ID = 'fb03c7b6-6d60-47aa-abd9-0d23fc765142';
-
 export async function getOrganizations() {
   const { data, error } = await supabase
     .from('organizations')
@@ -12,10 +10,10 @@ export async function getOrganizations() {
 }
 
 export async function createOrganization({ name, createdBy }) {
+  // tenant_id is assigned by the database (column default reads the JWT claim)
   const { data, error } = await supabase
     .from('organizations')
     .insert({
-      tenant_id: TENANT_ID,
       name,
       created_by: createdBy,
     })

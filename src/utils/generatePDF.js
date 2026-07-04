@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-export function generateContributionStatement({ member, contributions, organizationName }) {
+export function generateContributionStatement({ member, contributions, organizationName, currency = 'NGN' }) {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const today = new Date().toLocaleDateString('en-GB', {
@@ -12,7 +12,7 @@ export function generateContributionStatement({ member, contributions, organizat
   doc.setFontSize(20);
   doc.setTextColor(90, 196, 153); // orange
   doc.setFont('helvetica', 'bold');
-  doc.text('Thriftly', 14, 20);
+  doc.text('Owen', 14, 20);
 
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
@@ -75,9 +75,9 @@ export function generateContributionStatement({ member, contributions, organizat
     startY: 105,
     head: [['Total Expected', 'Total Paid', 'Outstanding', 'Compliance Rate']],
     body: [[
-      `£${totalDue.toLocaleString()}`,
-      `£${totalPaid.toLocaleString()}`,
-      `£${outstanding.toLocaleString()}`,
+      `${currency} ${totalDue.toLocaleString()}`,
+      `${currency} ${totalPaid.toLocaleString()}`,
+      `${currency} ${outstanding.toLocaleString()}`,
       `${compliance}%`,
     ]],
     headStyles: { fillColor: [90, 196, 153], textColor: 255, fontStyle: 'bold' },
@@ -94,11 +94,11 @@ export function generateContributionStatement({ member, contributions, organizat
   doc.text('Contribution History', 14, historyStartY);
 
   const rows = contributions.map(c => [
-    c.cycle?.thrift_group?.name ?? '—',
+    c.cycle?.contribution_group?.name ?? '—',
     c.cycle ? `#${c.cycle.cycle_number}` : '—',
     c.cycle?.start_date ? new Date(c.cycle.start_date).toLocaleDateString('en-GB') : '—',
-    `£${Number(c.amount_due).toLocaleString()}`,
-    `£${Number(c.amount_paid).toLocaleString()}`,
+    `${currency} ${Number(c.amount_due).toLocaleString()}`,
+    `${currency} ${Number(c.amount_paid).toLocaleString()}`,
     c.payment_date ? new Date(c.payment_date).toLocaleDateString('en-GB') : '—',
     c.status.toUpperCase(),
   ]);
@@ -131,7 +131,7 @@ export function generateContributionStatement({ member, contributions, organizat
   doc.setFontSize(8);
   doc.setTextColor(90, 196, 153);
   doc.setFont('helvetica', 'bold');
-  doc.text('ISSUED BY THRIFTLY', stampX, stampY, { align: 'center' });
+  doc.text('ISSUED BY OWEN', stampX, stampY, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
@@ -145,7 +145,7 @@ export function generateContributionStatement({ member, contributions, organizat
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
     doc.text(
-      `${organizationName} | Powered by Thriftly | Page ${i} of ${pageCount}`,
+      `${organizationName} | Powered by Owen | Page ${i} of ${pageCount}`,
       pageWidth / 2,
       doc.internal.pageSize.getHeight() - 10,
       { align: 'center' }

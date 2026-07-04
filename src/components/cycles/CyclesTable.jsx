@@ -2,28 +2,34 @@ import { useState } from 'react'
 import Table from '../ui/Table'
 import Badge from '../ui/Badge'
 import { useAllCycles } from '../../hooks/useCycles'
+import { useTenant } from '../../context/TenantContext'
+import { formatMoney } from '../../utils/money'
 
-const columns = [
-  { key: 'name', label: 'Group Name', render: (row) => row.thrift_group?.name ?? '—' },
-  { key: 'cycle_number', label: 'Cycle No.', render: (row) => `#${row.cycle_number}` },
-  {
-    key: 'contribution_amount',
-    label: 'Contribution',
-    render: (row) => row.thrift_group?.contribution_amount
-      ? `£${Number(row.thrift_group.contribution_amount).toLocaleString()}`
-      : '—',
-  },
-  { key: 'frequency', label: 'Frequency', render: (row) => row.thrift_group?.contribution_frequency ?? '—' },
-  { key: 'start_date', label: 'Start Date', render: (row) => new Date(row.start_date).toLocaleDateString('en-GB') },
-  { key: 'end_date', label: 'End Date', render: (row) => new Date(row.end_date).toLocaleDateString('en-GB') },
-  { key: 'status', label: 'Status', render: (row) => <Badge status={row.status} /> },
-]
+function buildColumns(currency) {
+  return [
+    { key: 'name', label: 'Group Name', render: (row) => row.contribution_group?.name ?? '—' },
+    { key: 'cycle_number', label: 'Cycle No.', render: (row) => `#${row.cycle_number}` },
+    {
+      key: 'contribution_amount',
+      label: 'Contribution',
+      render: (row) => row.contribution_group?.contribution_amount
+        ? formatMoney(row.contribution_group.contribution_amount, currency)
+        : '—',
+    },
+    { key: 'frequency', label: 'Frequency', render: (row) => row.contribution_group?.contribution_frequency ?? '—' },
+    { key: 'start_date', label: 'Start Date', render: (row) => new Date(row.start_date).toLocaleDateString('en-GB') },
+    { key: 'end_date', label: 'End Date', render: (row) => new Date(row.end_date).toLocaleDateString('en-GB') },
+    { key: 'status', label: 'Status', render: (row) => <Badge status={row.status} /> },
+  ]
+}
 
 const PAGE_SIZE = 10
 
 function CyclesTable() {
+  const tenant = useTenant()
   const { data: cycles, isLoading, isError } = useAllCycles()
   const [page, setPage] = useState(1)
+  const columns = buildColumns(tenant?.currency)
 
   const totalPages = Math.ceil((cycles?.length ?? 0) / PAGE_SIZE)
   const paginated = cycles?.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) ?? []

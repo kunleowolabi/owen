@@ -1,8 +1,8 @@
 import { NavLink } from 'react-router-dom'
 
-// Remove the import logo line entirely
+function Navbar({ userName, onLogout }) {
+  const initial = (userName || '?').charAt(0).toUpperCase()
 
-function Navbar() {
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-0">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -11,7 +11,7 @@ function Navbar() {
         <div className="flex items-center py-3">
           <img src="/logo.svg" alt="Owen" className="h-9 w-auto min-w-[120px]" />
         </div>
-        
+
         {/* Centre — Nav links */}
         <div className="flex items-center gap-1">
           {[
@@ -37,12 +37,18 @@ function Navbar() {
           ))}
         </div>
 
-        {/* Right — Demo badge */}
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        {/* Right — User identity + sign out */}
+        <div className="flex items-center gap-3 text-sm text-gray-500">
           <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-medium text-sm">
-            D
+            {initial}
           </div>
-          <span className="text-gray-600 text-sm">Demo</span>
+          <span className="hidden sm:block text-gray-700 text-sm font-medium">{userName}</span>
+          <button
+            onClick={onLogout}
+            className="ml-1 px-3 py-1.5 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 transition-colors"
+          >
+            Sign out
+          </button>
         </div>
 
       </div>

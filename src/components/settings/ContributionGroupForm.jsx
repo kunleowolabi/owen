@@ -1,13 +1,18 @@
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { createThriftGroup } from '../../services/groupService'
+import { createContributionGroup } from '../../services/groupService'
 import { useOrganizations } from '../../hooks/useOrganizations'
 import { supabase } from '../../supabaseClient'
+import { useTenant } from '../../context/TenantContext'
+import { currencySymbol } from '../../utils/money'
+import { friendlyError } from '../../utils/friendlyError'
 
 const FREQUENCIES = ['weekly', 'biweekly', 'monthly']
 
-function ThriftGroupForm() {
+function ContributionGroupForm() {
   const queryClient = useQueryClient()
+  const tenant = useTenant()
+  const symbol = currencySymbol(tenant?.currency)
   const { data: organizations, isLoading: loadingOrgs } = useOrganizations()
 
   const [form, setForm] = useState({
@@ -35,7 +40,7 @@ function ThriftGroupForm() {
     setSuccess(false)
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      await createThriftGroup({
+      await createContributionGroup({
         name: form.name.trim(),
         organizationId: form.organizationId,
         contributionAmount: parseFloat(form.contributionAmount),
@@ -45,9 +50,9 @@ function ThriftGroupForm() {
       })
       setSuccess(true)
       setForm({ name: '', organizationId: '', contributionAmount: '', contributionFrequency: 'monthly', startDate: '' })
-      queryClient.invalidateQueries({ queryKey: ['thriftGroups'] })
+      queryClient.invalidateQueries({ queryKey: ['contributionGroups'] })
     } catch (err) {
-      setError(err.message)
+      setError(friendlyError(err))
     } finally {
       setLoading(false)
     }
@@ -55,7 +60,7 @@ function ThriftGroupForm() {
 
   return (
     <div className="max-w-lg">
-      <h2 className="text-base font-semibold text-gray-800 mb-6">Add Thrift Group</h2>
+      <h2 className="text-base font-semibold text-gray-800 mb-6">Add Contribution Group</h2>
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
 
         <div>
@@ -65,7 +70,7 @@ function ThriftGroupForm() {
             name="name"
             value={form.name}
             onChange={handleChange}
-            placeholder="e.g. Ikeja Thrift Circle"
+            placeholder="e.g. Ikeja Staff Unit"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5ac499]"
           />
         </div>
@@ -87,7 +92,7 @@ function ThriftGroupForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Contribution Amount (£)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Contribution Amount ({symbol})</label>
           <input
             type="number"
             name="contributionAmount"
@@ -124,18 +129,18 @@ function ThriftGroupForm() {
         </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}
-        {success && <p className="text-sm text-green-600">Thrift group created successfully.</p>}
+        {success && <p className="text-sm text-green-600">Contribution group created successfully.</p>}
 
         <button
           onClick={handleSubmit}
           disabled={loading}
           className="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors disabled:opacity-50"
         >
-          {loading ? 'Creating...' : 'Create Thrift Group'}
+          {loading ? 'Creating...' : 'Create Contribution Group'}
         </button>
       </div>
     </div>
   )
 }
 
-export default ThriftGroupForm
+export default ContributionGroupForm

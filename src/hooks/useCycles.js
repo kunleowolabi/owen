@@ -3,11 +3,11 @@ import { getCycles, getActiveCycles, getActiveCycleCount, getTotalCycleCount, ge
 import { getContributionsByCycle } from '../services/contributionService';
 import { getPayoutsByCycle } from '../services/payoutService';
 
-export function useCycles(thriftGroupId) {
+export function useCycles(contributionGroupId) {
   return useQuery({
-    queryKey: ['cycles', thriftGroupId],
-    queryFn: () => getCycles(thriftGroupId),
-    enabled: !!thriftGroupId,
+    queryKey: ['cycles', contributionGroupId],
+    queryFn: () => getCycles(contributionGroupId),
+    enabled: !!contributionGroupId,
   });
 }
 

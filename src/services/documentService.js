@@ -12,7 +12,7 @@ export async function getPendingDocumentRequests() {
         user:users (
           full_name
         ),
-        thrift_group:thrift_groups (
+        contribution_group:contribution_groups (
           name
         )
       )
@@ -68,7 +68,7 @@ export async function getAllDocumentRequests() {
           full_name,
           email
         ),
-        thrift_group:thrift_groups (
+        contribution_group:contribution_groups (
           name
         )
       )

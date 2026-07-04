@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { createCycle } from '../../services/cycleService'
-import { useThriftGroups } from '../../hooks/useGroups'
+import { useContributionGroups } from '../../hooks/useGroups'
 import { supabase } from '../../supabaseClient'
 
 function CycleForm() {
   const queryClient = useQueryClient()
-  const { data: groups, isLoading: loadingGroups } = useThriftGroups()
+  const { data: groups, isLoading: loadingGroups } = useContributionGroups()
 
   const [form, setForm] = useState({
-    thriftGroupId: '',
+    contributionGroupId: '',
     cycleNumber: '',
     startDate: '',
     endDate: '',
@@ -23,7 +23,7 @@ function CycleForm() {
   }
 
   async function handleSubmit() {
-    if (!form.thriftGroupId || !form.cycleNumber || !form.startDate || !form.endDate) {
+    if (!form.contributionGroupId || !form.cycleNumber || !form.startDate || !form.endDate) {
       setError('All fields are required')
       return
     }
@@ -37,14 +37,14 @@ function CycleForm() {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       await createCycle({
-        thriftGroupId: form.thriftGroupId,
+        contributionGroupId: form.contributionGroupId,
         cycleNumber: parseInt(form.cycleNumber),
         startDate: form.startDate,
         endDate: form.endDate,
         createdBy: user.id,
       })
       setSuccess(true)
-      setForm({ thriftGroupId: '', cycleNumber: '', startDate: '', endDate: '' })
+      setForm({ contributionGroupId: '', cycleNumber: '', startDate: '', endDate: '' })
       queryClient.invalidateQueries({ queryKey: ['allCycles'] })
       queryClient.invalidateQueries({ queryKey: ['activeCycles'] })
     } catch (err) {
@@ -60,14 +60,14 @@ function CycleForm() {
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Thrift Group</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Contribution Group</label>
           <select
-            name="thriftGroupId"
-            value={form.thriftGroupId}
+            name="contributionGroupId"
+            value={form.contributionGroupId}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5ac499]"
           >
-            <option value="">Select thrift group...</option>
+            <option value="">Select contribution group...</option>
             {loadingGroups && <option disabled>Loading...</option>}
             {groups?.map(g => (
               <option key={g.id} value={g.id}>{g.name}</option>

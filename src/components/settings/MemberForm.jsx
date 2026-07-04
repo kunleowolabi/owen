@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { createMember } from '../../services/memberService'
-import { useThriftGroups } from '../../hooks/useGroups'
+import { useContributionGroups } from '../../hooks/useGroups'
 import { supabase } from '../../supabaseClient'
 
 const ROLES = ['member', 'treasurer', 'admin']
@@ -9,7 +9,7 @@ const GENDERS = ['male', 'female', 'other']
 
 function MemberForm() {
   const queryClient = useQueryClient()
-  const { data: groups, isLoading: loadingGroups } = useThriftGroups()
+  const { data: groups, isLoading: loadingGroups } = useContributionGroups()
 
   const [form, setForm] = useState({
     fullName: '',
@@ -17,7 +17,7 @@ function MemberForm() {
     phone: '',
     dateOfBirth: '',
     gender: '',
-    thriftGroupId: '',
+    contributionGroupId: '',
     role: 'member',
     joinDate: '',
   })
@@ -30,8 +30,8 @@ function MemberForm() {
   }
 
   async function handleSubmit() {
-    if (!form.fullName.trim() || !form.email.trim() || !form.thriftGroupId || !form.joinDate) {
-      setError('Full name, email, thrift group and join date are required')
+    if (!form.fullName.trim() || !form.email.trim() || !form.contributionGroupId || !form.joinDate) {
+      setError('Full name, email, contribution group and join date are required')
       return
     }
     setLoading(true)
@@ -45,13 +45,13 @@ function MemberForm() {
         phone: form.phone.trim(),
         dateOfBirth: form.dateOfBirth || null,
         gender: form.gender || null,
-        thriftGroupId: form.thriftGroupId,
+        contributionGroupId: form.contributionGroupId,
         role: form.role,
         joinDate: form.joinDate,
         createdBy: user.id,
       })
       setSuccess(true)
-      setForm({ fullName: '', email: '', phone: '', dateOfBirth: '', gender: '', thriftGroupId: '', role: 'member', joinDate: '' })
+      setForm({ fullName: '', email: '', phone: '', dateOfBirth: '', gender: '', contributionGroupId: '', role: 'member', joinDate: '' })
       queryClient.invalidateQueries({ queryKey: ['allMembers'] })
       queryClient.invalidateQueries({ queryKey: ['activeMemberCount'] })
       queryClient.invalidateQueries({ queryKey: ['totalMemberCount'] })
@@ -131,14 +131,14 @@ function MemberForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Thrift Group</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Contribution Group</label>
           <select
-            name="thriftGroupId"
-            value={form.thriftGroupId}
+            name="contributionGroupId"
+            value={form.contributionGroupId}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5ac499]"
           >
-            <option value="">Select thrift group...</option>
+            <option value="">Select contribution group...</option>
             {loadingGroups && <option disabled>Loading...</option>}
             {groups?.map(g => (
               <option key={g.id} value={g.id}>{g.name}</option>

@@ -3,8 +3,11 @@ import { useAllMembers } from '../../hooks/useMembers'
 import { getContributionsByMembership } from '../../services/contributionService'
 import { getMemberById } from '../../services/memberService'
 import { generateContributionStatement } from '../../utils/generatePDF'
+import { useTenant } from '../../context/TenantContext'
+import { friendlyError } from '../../utils/friendlyError'
 
-function GenerateReportModal({ onClose, tenant }) {
+function GenerateReportModal({ onClose }) {
+  const tenant = useTenant()
   const { data: members, isLoading: loadingMembers } = useAllMembers()
   const [membershipId, setMembershipId] = useState('')
   const [loading, setLoading] = useState(false)
@@ -25,11 +28,12 @@ function GenerateReportModal({ onClose, tenant }) {
       generateContributionStatement({
         member,
         contributions,
-        organizationName: tenant?.name ?? 'Thriftly',
+        organizationName: tenant?.name ?? 'Owen',
+        currency: tenant?.currency,
       })
       onClose()
     } catch (err) {
-      setError(err.message)
+      setError(friendlyError(err))
     } finally {
       setLoading(false)
     }

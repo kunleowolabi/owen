@@ -45,7 +45,7 @@ export async function getRecentContributions(limit = 10) {
         user:users!memberships_user_id_fkey (
           full_name
         ),
-        thrift_group:thrift_groups!memberships_thrift_group_id_fkey (
+        contribution_group:contribution_groups!memberships_contribution_group_id_fkey (
           name
         )
       )
@@ -67,18 +67,18 @@ export async function getPendingContributionsCount() {
   return count;
 }
 
-export async function createContribution({ membershipId, cycleId, amountDue, amountPaid, paymentDate, status, recordedBy }) {
-  const TENANT_ID = 'fb03c7b6-6d60-47aa-abd9-0d23fc765142';
+export async function createContribution({ membershipId, cycleId, amountDue, amountPaid, paymentDate, recordedBy }) {
+  // tenant_id is assigned by the database (column default reads the JWT claim).
+  // status is intentionally NOT sent — the DB derives it from the amounts
+  // (see the contributions_derive_status trigger).
   const { data, error } = await supabase
     .from('contributions')
     .insert({
-      tenant_id: TENANT_ID,
       membership_id: membershipId,
       cycle_id: cycleId,
       amount_due: amountDue,
       amount_paid: amountPaid,
       payment_date: paymentDate || null,
-      status,
       recorded_by: recordedBy,
     })
     .select()
@@ -100,7 +100,7 @@ export async function getContributionsByMembership(membershipId) {
         cycle_number,
         start_date,
         end_date,
-        thrift_group:thrift_groups!cycles_thrift_group_id_fkey (
+        contribution_group:contribution_groups!cycles_contribution_group_id_fkey (
           name
         )
       )

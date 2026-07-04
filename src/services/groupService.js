@@ -1,12 +1,10 @@
 import { supabase } from '../supabaseClient';
 
-const TENANT_ID = 'fb03c7b6-6d60-47aa-abd9-0d23fc765142';
-
-export async function createThriftGroup({ name, organizationId, contributionAmount, contributionFrequency, startDate, createdBy }) {
+export async function createContributionGroup({ name, organizationId, contributionAmount, contributionFrequency, startDate, createdBy }) {
+  // tenant_id is assigned by the database (column default reads the JWT claim)
   const { data, error } = await supabase
-    .from('thrift_groups')
+    .from('contribution_groups')
     .insert({
-      tenant_id: TENANT_ID,
       organization_id: organizationId,
       name,
       contribution_amount: contributionAmount,
@@ -20,16 +18,16 @@ export async function createThriftGroup({ name, organizationId, contributionAmou
   return data;
 }
 
-export async function getThriftGroups() {
+export async function getContributionGroups() {
   const { data, error } = await supabase
-    .from('thrift_groups')
+    .from('contribution_groups')
     .select(`
       id,
       name,
       contribution_amount,
       contribution_frequency,
       start_date,
-      organization:organizations!thrift_groups_organization_id_fkey (
+      organization:organizations!contribution_groups_organization_id_fkey (
         name
       )
     `)
@@ -38,7 +36,7 @@ export async function getThriftGroups() {
   return data;
 }
 
-export async function getMembersByGroup(thriftGroupId) {
+export async function getMembersByGroup(contributionGroupId) {
   const { data, error } = await supabase
     .from('memberships')
     .select(`
@@ -47,17 +45,17 @@ export async function getMembersByGroup(thriftGroupId) {
         full_name
       )
     `)
-    .eq('thrift_group_id', thriftGroupId)
+    .eq('contribution_group_id', contributionGroupId)
     .eq('status', 'active');
   if (error) throw error;
   return data;
 }
 
-export async function getCyclesByGroup(thriftGroupId) {
+export async function getCyclesByGroup(contributionGroupId) {
   const { data, error } = await supabase
     .from('cycles')
     .select('id, cycle_number, status')
-    .eq('thrift_group_id', thriftGroupId)
+    .eq('contribution_group_id', contributionGroupId)
     .order('cycle_number', { ascending: false });
   if (error) throw error;
   return data;

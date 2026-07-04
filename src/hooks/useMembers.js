@@ -11,11 +11,11 @@ import {
   getTopContributors,
 } from '../services/memberService';
 
-export function useMembers(thriftGroupId) {
+export function useMembers(contributionGroupId) {
   return useQuery({
-    queryKey: ['members', thriftGroupId],
-    queryFn: () => getMembers(thriftGroupId),
-    enabled: !!thriftGroupId,
+    queryKey: ['members', contributionGroupId],
+    queryFn: () => getMembers(contributionGroupId),
+    enabled: !!contributionGroupId,
   });
 }
 

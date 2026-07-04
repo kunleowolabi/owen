@@ -1,8 +1,6 @@
 import { supabase } from '../supabaseClient';
 
-const TENANT_ID = 'fb03c7b6-6d60-47aa-abd9-0d23fc765142';
-
-export async function getCycles(thriftGroupId) {
+export async function getCycles(contributionGroupId) {
   const { data, error } = await supabase
     .from('cycles')
     .select(`
@@ -11,14 +9,14 @@ export async function getCycles(thriftGroupId) {
       start_date,
       end_date,
       status,
-      thrift_group:thrift_groups (
+      contribution_group:contribution_groups (
         id,
         name,
         contribution_amount,
         contribution_frequency
       )
     `)
-    .eq('thrift_group_id', thriftGroupId)
+    .eq('contribution_group_id', contributionGroupId)
     .order('cycle_number', { ascending: false });
 
   if (error) throw error;
@@ -34,7 +32,7 @@ export async function getActiveCycles() {
       start_date,
       end_date,
       status,
-      thrift_group:thrift_groups (
+      contribution_group:contribution_groups (
         id,
         name,
         contribution_amount,
@@ -75,7 +73,7 @@ export async function getAllCycles() {
       start_date,
       end_date,
       status,
-      thrift_group:thrift_groups!cycles_thrift_group_id_fkey (
+      contribution_group:contribution_groups!cycles_contribution_group_id_fkey (
         id,
         name,
         contribution_amount,
@@ -93,7 +91,7 @@ export async function getContributionCompliance() {
     .select(`
       status,
       cycle:cycles!contributions_cycle_id_fkey (
-        thrift_group:thrift_groups!cycles_thrift_group_id_fkey (
+        contribution_group:contribution_groups!cycles_contribution_group_id_fkey (
           name
         )
       )
@@ -102,7 +100,7 @@ export async function getContributionCompliance() {
 
   const map = {};
   data.forEach(row => {
-    const name = row.cycle?.thrift_group?.name ?? 'Unknown';
+    const name = row.cycle?.contribution_group?.name ?? 'Unknown';
     if (!map[name]) map[name] = { name, paid: 0, pending: 0, defaulted: 0 };
     if (row.status === 'paid') map[name].paid++;
     else if (row.status === 'pending') map[name].pending++;
@@ -112,12 +110,12 @@ export async function getContributionCompliance() {
   return Object.values(map);
 }
 
-export async function createCycle({ thriftGroupId, cycleNumber, startDate, endDate, createdBy }) {
+export async function createCycle({ contributionGroupId, cycleNumber, startDate, endDate, createdBy }) {
+  // tenant_id is assigned by the database (column default reads the JWT claim)
   const { data, error } = await supabase
     .from('cycles')
     .insert({
-      tenant_id: TENANT_ID,
-      thrift_group_id: thriftGroupId,
+      contribution_group_id: contributionGroupId,
       cycle_number: cycleNumber,
       start_date: startDate,
       end_date: endDate,

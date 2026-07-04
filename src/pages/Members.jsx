@@ -4,10 +4,10 @@ import MembersCharts from '../components/members/MembersCharts'
 import MembersTable from '../components/members/MembersTable'
 import TopContributors from '../components/members/TopContributors'
 
-function Members({ tenant }) {
+function Members() {
   return (
     <div>
-      <PageHeader title="Members" subtitle={tenant?.name ?? ''} />
+      <PageHeader title="Members" />
       <MembersStatsRow />
       <MembersCharts />
       <TopContributors />

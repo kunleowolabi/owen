@@ -4,21 +4,25 @@ import { getMemberById } from '../services/memberService'
 import { getContributionsByMembership } from '../services/contributionService'
 import Badge from '../components/ui/Badge'
 import Table from '../components/ui/Table'
+import { useTenant } from '../context/TenantContext'
+import { formatMoney } from '../utils/money'
 
-const contributionColumns = [
-  { key: 'group', label: 'Group', render: (row) => row.cycle?.thrift_group?.name ?? '—' },
-  { key: 'cycle', label: 'Cycle', render: (row) => row.cycle ? `#${row.cycle.cycle_number}` : '—' },
-  { key: 'amount_due', label: 'Amount Due', render: (row) => `£${Number(row.amount_due).toLocaleString()}` },
-  { key: 'amount_paid', label: 'Amount Paid', render: (row) => `£${Number(row.amount_paid).toLocaleString()}` },
-  {
-    key: 'payment_date',
-    label: 'Payment Date',
-    render: (row) => row.payment_date
-      ? new Date(row.payment_date).toLocaleDateString('en-GB')
-      : '—',
-  },
-  { key: 'status', label: 'Status', render: (row) => <Badge status={row.status} /> },
-]
+function buildContributionColumns(currency) {
+  return [
+    { key: 'group', label: 'Group', render: (row) => row.cycle?.contribution_group?.name ?? '—' },
+    { key: 'cycle', label: 'Cycle', render: (row) => row.cycle ? `#${row.cycle.cycle_number}` : '—' },
+    { key: 'amount_due', label: 'Amount Due', render: (row) => formatMoney(row.amount_due, currency) },
+    { key: 'amount_paid', label: 'Amount Paid', render: (row) => formatMoney(row.amount_paid, currency) },
+    {
+      key: 'payment_date',
+      label: 'Payment Date',
+      render: (row) => row.payment_date
+        ? new Date(row.payment_date).toLocaleDateString('en-GB')
+        : '—',
+    },
+    { key: 'status', label: 'Status', render: (row) => <Badge status={row.status} /> },
+  ]
+}
 
 const flagColumns = [
   { key: 'reason', label: 'Reason' },
@@ -72,6 +76,7 @@ function Section({ title, children }) {
 function MemberDetail() {
   const { membershipId } = useParams()
   const navigate = useNavigate()
+  const tenant = useTenant()
 
   const { data: member, isLoading: loadingMember, isError: errorMember } = useQuery({
     queryKey: ['member', membershipId],
@@ -85,14 +90,11 @@ function MemberDetail() {
     enabled: !!membershipId,
   })
 
-  console.log('membershipId:', membershipId)
-  console.log('member data:', member)
-  console.log('member error:', errorMember)
-
   if (loadingMember) return <p className="text-sm text-gray-400">Loading member...</p>
   if (errorMember) return <p className="text-sm text-red-400">Failed to load member.</p>
 
   const user = member?.user
+  const contributionColumns = buildContributionColumns(tenant?.currency)
 
   return (
     <div>

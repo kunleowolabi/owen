@@ -1,24 +1,25 @@
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { createContribution } from '../../services/contributionService'
-import { useThriftGroups } from '../../hooks/useGroups'
+import { useContributionGroups } from '../../hooks/useGroups'
 import { getMembersByGroup, getCyclesByGroup } from '../../services/groupService'
 import { supabase } from '../../supabaseClient'
-
-const STATUSES = ['paid', 'pending', 'partial', 'defaulted']
+import { friendlyError } from '../../utils/friendlyError'
+import { useTenant } from '../../context/TenantContext'
+import { currencySymbol } from '../../utils/money'
 
 function ContributionForm() {
   const queryClient = useQueryClient()
-  const { data: groups, isLoading: loadingGroups } = useThriftGroups()
+  const symbol = currencySymbol(useTenant()?.currency)
+  const { data: groups, isLoading: loadingGroups } = useContributionGroups()
 
   const [form, setForm] = useState({
-    thriftGroupId: '',
+    contributionGroupId: '',
     membershipId: '',
     cycleId: '',
     amountDue: '',
     amountPaid: '',
     paymentDate: '',
-    status: 'paid',
   })
   const [members, setMembers] = useState([])
   const [cycles, setCycles] = useState([])
@@ -30,7 +31,7 @@ function ContributionForm() {
 
   async function handleGroupChange(e) {
     const groupId = e.target.value
-    setForm(f => ({ ...f, thriftGroupId: groupId, membershipId: '', cycleId: '' }))
+    setForm(f => ({ ...f, contributionGroupId: groupId, membershipId: '', cycleId: '' }))
     if (!groupId) { setMembers([]); setCycles([]); return }
 
     setLoadingMembers(true)
@@ -43,7 +44,7 @@ function ContributionForm() {
       setMembers(m)
       setCycles(c)
     } catch (err) {
-      setError(err.message)
+      setError(friendlyError(err))
     } finally {
       setLoadingMembers(false)
       setLoadingCycles(false)
@@ -70,18 +71,17 @@ function ContributionForm() {
         amountDue: parseFloat(form.amountDue),
         amountPaid: parseFloat(form.amountPaid),
         paymentDate: form.paymentDate || null,
-        status: form.status,
         recordedBy: user.id,
       })
       setSuccess(true)
-      setForm({ thriftGroupId: '', membershipId: '', cycleId: '', amountDue: '', amountPaid: '', paymentDate: '', status: 'paid' })
+      setForm({ contributionGroupId: '', membershipId: '', cycleId: '', amountDue: '', amountPaid: '', paymentDate: '' })
       setMembers([])
       setCycles([])
       queryClient.invalidateQueries({ queryKey: ['recentContributions'] })
       queryClient.invalidateQueries({ queryKey: ['totalContributions'] })
       queryClient.invalidateQueries({ queryKey: ['pendingContributionsCount'] })
     } catch (err) {
-      setError(err.message)
+      setError(friendlyError(err))
     } finally {
       setLoading(false)
     }
@@ -93,14 +93,14 @@ function ContributionForm() {
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Thrift Group</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Contribution Group</label>
           <select
-            name="thriftGroupId"
-            value={form.thriftGroupId}
+            name="contributionGroupId"
+            value={form.contributionGroupId}
             onChange={handleGroupChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5ac499]"
           >
-            <option value="">Select thrift group...</option>
+            <option value="">Select contribution group...</option>
             {loadingGroups && <option disabled>Loading...</option>}
             {groups?.map(g => (
               <option key={g.id} value={g.id}>{g.name}</option>
@@ -114,7 +114,7 @@ function ContributionForm() {
             name="membershipId"
             value={form.membershipId}
             onChange={handleChange}
-            disabled={!form.thriftGroupId}
+            disabled={!form.contributionGroupId}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5ac499] disabled:opacity-50"
           >
             <option value="">Select member...</option>
@@ -131,7 +131,7 @@ function ContributionForm() {
             name="cycleId"
             value={form.cycleId}
             onChange={handleChange}
-            disabled={!form.thriftGroupId}
+            disabled={!form.contributionGroupId}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5ac499] disabled:opacity-50"
           >
             <option value="">Select cycle...</option>
@@ -144,7 +144,7 @@ function ContributionForm() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Amount Due (£)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Amount Due ({symbol})</label>
             <input
               type="number"
               name="amountDue"
@@ -155,7 +155,7 @@ function ContributionForm() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Amount Paid (£)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Amount Paid ({symbol})</label>
             <input
               type="number"
               name="amountPaid"
@@ -167,30 +167,18 @@ function ContributionForm() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Date <span className="text-gray-400">(optional)</span></label>
-            <input
-              type="date"
-              name="paymentDate"
-              value={form.paymentDate}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5ac499]"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5ac499]"
-            >
-              {STATUSES.map(s => (
-                <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
-              ))}
-            </select>
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Payment Date <span className="text-gray-400">(optional)</span></label>
+          <input
+            type="date"
+            name="paymentDate"
+            value={form.paymentDate}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5ac499]"
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            Status is set automatically from the amounts — paid, partial or pending.
+          </p>
         </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}

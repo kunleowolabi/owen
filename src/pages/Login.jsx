@@ -25,7 +25,7 @@ function Login({ onLogin }) {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-sm">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#5ac499]">Thriftly</h1>
+          <h1 className="text-2xl font-bold text-[#5ac499]">Owen</h1>
           <p className="text-sm text-gray-500 mt-1">Sign in to your admin dashboard</p>
         </div>
 

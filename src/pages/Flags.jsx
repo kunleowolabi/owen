@@ -8,7 +8,7 @@ const SEVERITY = {
   low:    { badge: 'bg-gray-100 text-gray-600',      label: 'Low',    subtitle: 'severity' },
 }
 
-function Flags({ tenant }) {
+function Flags() {
   const { data: flags, isLoading, isError } = useQuery({
     queryKey: ['openFlags'],
     queryFn: getOpenFlags,
@@ -26,7 +26,7 @@ function Flags({ tenant }) {
 
   return (
     <div>
-      <PageHeader title="Flags" subtitle={tenant?.name ?? ''} />
+      <PageHeader title="Flags" />
 
       {/* Stats row — matches StatCard exactly */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -65,7 +65,7 @@ function Flags({ tenant }) {
             {flags?.map((flag) => (
               <tr key={flag.id} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
                 <td className="px-5 py-3 font-medium text-gray-800">{flag.membership?.user?.full_name ?? '—'}</td>
-                <td className="px-5 py-3 text-gray-500">{flag.membership?.thrift_group?.name ?? '—'}</td>
+                <td className="px-5 py-3 text-gray-500">{flag.membership?.contribution_group?.name ?? '—'}</td>
                 <td className="px-5 py-3 text-gray-600 max-w-xs truncate">{flag.reason}</td>
                 <td className="px-5 py-3 text-gray-600 capitalize">{flag.severity}</td>
                 <td className="px-5 py-3 text-gray-400">

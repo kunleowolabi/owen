@@ -7,7 +7,7 @@ import GenerateReportModal from './GenerateReportModal'
 const columns = [
   { key: 'member', label: 'Member', render: (row) => row.membership?.user?.full_name ?? '—' },
   { key: 'email', label: 'Email', render: (row) => row.membership?.user?.email ?? '—' },
-  { key: 'group', label: 'Group', render: (row) => row.membership?.thrift_group?.name ?? '—' },
+  { key: 'group', label: 'Group', render: (row) => row.membership?.contribution_group?.name ?? '—' },
   {
     key: 'type',
     label: 'Document Type',

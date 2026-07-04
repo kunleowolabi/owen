@@ -2,7 +2,7 @@
 
 A cooperative financial management platform for organisations that run group savings and contribution schemes.
 
-Owen gives administrators a structured, auditable record of member contributions, active cycles, and compliance flags — the kind of paper trail that informal thrift groups typically lack.
+Owen gives administrators a structured, auditable record of member contributions, active cycles, and compliance flags — the kind of paper trail that paper registers and spreadsheets typically lack.
 
 ![Members](screenshots/Members.png)
 ![Flags](screenshots/flags.png)

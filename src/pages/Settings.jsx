@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import PageHeader from '../components/ui/PageHeader'
 import OrganizationForm from '../components/settings/OrganizationForm'
-import ThriftGroupForm from '../components/settings/ThriftGroupForm'
+import ContributionGroupForm from '../components/settings/ContributionGroupForm'
 import CycleForm from '../components/settings/CycleForm'
 import MemberForm from '../components/settings/MemberForm'
 import ContributionForm from '../components/settings/ContributionForm'
 
 const TABS = [
   { id: 'members',       label: 'Members'       },
-  { id: 'groups',        label: 'Thrift Groups'  },
+  { id: 'groups',        label: 'Contribution Groups'  },
   { id: 'cycles',        label: 'Cycles'        },
   { id: 'contributions', label: 'Contributions' },
   { id: 'organizations', label: 'Organizations' },
@@ -42,7 +42,7 @@ function Settings() {
 
       <div>
         {activeTab === 'members'       && <MemberForm />}
-        {activeTab === 'groups'        && <ThriftGroupForm />}
+        {activeTab === 'groups'        && <ContributionGroupForm />}
         {activeTab === 'cycles'        && <CycleForm />}
         {activeTab === 'contributions' && <ContributionForm />}
         {activeTab === 'organizations' && <OrganizationForm />}

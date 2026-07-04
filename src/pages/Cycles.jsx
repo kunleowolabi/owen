@@ -3,10 +3,10 @@ import CyclesStatsRow from '../components/cycles/CyclesStatsRow'
 import CyclesTable from '../components/cycles/CyclesTable'
 import ComplianceChart from '../components/cycles/ComplianceChart'
 
-function Cycles({ tenant }) {
+function Cycles() {
   return (
     <div>
-      <PageHeader title="Cycles" subtitle={tenant?.name ?? ''} />
+      <PageHeader title="Cycles" />
       <CyclesStatsRow />
       <CyclesTable />
       <ComplianceChart />

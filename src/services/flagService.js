@@ -12,7 +12,7 @@ export async function getOpenFlags() {
         user:users!memberships_user_id_fkey (
           full_name
         ),
-        thrift_group:thrift_groups!memberships_thrift_group_id_fkey (
+        contribution_group:contribution_groups!memberships_contribution_group_id_fkey (
           name
         )
       )

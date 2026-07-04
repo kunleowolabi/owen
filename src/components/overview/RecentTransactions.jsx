@@ -1,42 +1,46 @@
 import Table from '../ui/Table'
 import Badge from '../ui/Badge'
 import { useRecentContributions } from '../../hooks/useOverviewStats'
+import { useTenant } from '../../context/TenantContext'
+import { formatMoney } from '../../utils/money'
 
-const columns = [
-  {
-    key: 'payment_date',
-    label: 'Date',
-    render: (row) =>
-      row.payment_date
-        ? new Date(row.payment_date).toLocaleDateString('en-GB')
-        : '—',
-  },
-  {
-    key: 'member',
-    label: 'Member',
-    render: (row) => row.membership?.user?.full_name ?? '—',
-  },
-  {
-    key: 'cycle',
-    label: 'Cycle',
-    render: (row) => row.membership?.thrift_group?.name ?? '—',
-  },
-  {
-    key: 'amount_paid',
-    label: 'Contribution',
-    render: (row) => `£${Number(row.amount_paid).toLocaleString()}`,
-  },
-  {
-    key: 'status',
-    label: 'Status',
-    render: (row) => <Badge status={row.status} />,
-  },
-]
+function buildColumns(currency) {
+  return [
+    {
+      key: 'payment_date',
+      label: 'Date',
+      render: (row) =>
+        row.payment_date
+          ? new Date(row.payment_date).toLocaleDateString('en-GB')
+          : '—',
+    },
+    {
+      key: 'member',
+      label: 'Member',
+      render: (row) => row.membership?.user?.full_name ?? '—',
+    },
+    {
+      key: 'cycle',
+      label: 'Cycle',
+      render: (row) => row.membership?.contribution_group?.name ?? '—',
+    },
+    {
+      key: 'amount_paid',
+      label: 'Contribution',
+      render: (row) => formatMoney(row.amount_paid, currency),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (row) => <Badge status={row.status} />,
+    },
+  ]
+}
 
 function RecentTransactions() {
+  const tenant = useTenant()
   const { data: contributions, isLoading, isError } = useRecentContributions(10)
-
-  console.log('contributions:', contributions)
+  const columns = buildColumns(tenant?.currency)
 
   return (
     <div>
